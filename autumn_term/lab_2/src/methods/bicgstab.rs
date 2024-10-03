@@ -4,7 +4,7 @@ pub fn bicgstab_solve(matrix: &DMatrix<f64>, f: &DVector<f64>, tolerance: f64, m
     let n = matrix.nrows();
     let mut x = DVector::zeros(n);  
     let mut r = f - matrix * &x;     
-    let mut r_hat = r.clone();       
+    let r_hat = r.clone();       
     let mut residuals = vec![];      
     let mut rho_old = 1.0;
     let mut alpha = 1.0;
