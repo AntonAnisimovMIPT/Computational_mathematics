@@ -1,8 +1,9 @@
 use nalgebra::{DMatrix, DVector};
 
-pub fn upper_relaxation_solve(matrix: &DMatrix<f64>, b: &DVector<f64>, omega: f64, tolerance: f64, max_iterations: usize) -> DVector<f64> {
+pub fn upper_relaxation_solve(matrix: &DMatrix<f64>, b: &DVector<f64>, omega: f64, tolerance: f64, max_iterations: usize) -> (DVector<f64>, Vec<f64>) {
     let n = matrix.nrows();
     let mut x = DVector::zeros(n); 
+    let mut residuals = Vec::new(); 
 
     for iteration in 0..max_iterations {
         let mut x_new = x.clone(); 
@@ -22,14 +23,17 @@ pub fn upper_relaxation_solve(matrix: &DMatrix<f64>, b: &DVector<f64>, omega: f6
             x_new[i] = (1.0 - omega) * x[i] + (omega * (b[i] - sum1 - sum2)) / matrix[(i, i)];
         }
 
+        let residual = b - matrix * &x_new;
+        residuals.push(residual.norm());
+
         if (&x_new - &x).norm() < tolerance {
             println!("The upper relaxation method converged in {} iterations", iteration + 1);
-            return x_new;
+            return (x_new, residuals);
         }
 
         x = x_new;
     }
 
-    println!("Warning!!! The upper_relaxation method did not converge for {} iterations.", max_iterations);
-    x
+    println!("Warning!!! The upper relaxation method did not converge for {} iterations.", max_iterations);
+    (x, residuals) 
 }

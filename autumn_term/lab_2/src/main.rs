@@ -97,14 +97,17 @@ fn main() {
     let tolerance_for_iters = 1e-12;
     let max_iterations = 1000000;
 
-    let x = jacobi_solve(&matrix, &f, tolerance_for_iters, max_iterations);
+    let (x, residuals) = jacobi_solve(&matrix, &f, tolerance_for_iters, max_iterations);
+    save_residuals_to_csv(&residuals, "./../../plots_data/jacobi.csv");
     save_solution_to_csv(results_file, "Jacobi", &x).expect("Error while writing Jacobi method results");
 
-    let x = seidel_solve(&matrix, &f, tolerance_for_iters, max_iterations);
+    let (x, residuals) = seidel_solve(&matrix, &f, tolerance_for_iters, max_iterations);
+    save_residuals_to_csv(&residuals, "./../../plots_data/seidel.csv");
     save_solution_to_csv(results_file, "Seidel", &x).expect("Error while writing Seidel method results");
 
     let omega = 1.00;
-    let x = upper_relaxation_solve(&matrix, &f, omega, tolerance_for_iters, max_iterations);
+    let (x, residuals) = upper_relaxation_solve(&matrix, &f, omega, tolerance_for_iters, max_iterations);
+    save_residuals_to_csv(&residuals, "./../../plots_data/upper_relaxation.csv");
     save_solution_to_csv(results_file, "Upper relaxation", &x).expect("Error while writing Upper relaxation method results");
 
     let learning_rate = 0.01;
