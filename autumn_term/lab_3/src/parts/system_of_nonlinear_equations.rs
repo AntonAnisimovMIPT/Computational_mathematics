@@ -28,29 +28,46 @@ fn dfy2(x: f64, y: f64, h: f64) -> f64 {
     (f2(x, y + h) - f2(x, y - h)) / (2.0 * h)
 }
 
-pub fn mpi_system(x0: f64, y0: f64, tol: f64, max_iter: usize) -> Option<(f64, f64)> {
+pub fn mpi_system(
+    x0: f64, 
+    y0: f64, 
+    tol: f64, 
+    max_iter: usize
+) -> Option<(f64, f64, Vec<f64>)> {
     let (mut x, mut y) = (x0, y0);
+    let mut errors = Vec::new(); // Вектор для погрешностей
+    
     for _ in 0..max_iter {
         let x_new = y.cos() + 0.85;
         let y_new = x.sin() - 1.32;
-        if (x_new - x).abs() < tol && (y_new - y).abs() < tol {
+        let error = ((x_new - x).abs() + (y_new - y).abs()) / 2.0; // Средняя ошибка
+        errors.push(error);
+
+        if error < tol {
             if f1(x_new, y_new).abs() < tol && f2(x_new, y_new).abs() < tol {
-                return Some((x_new, y_new));
+                return Some((x_new, y_new, errors));
             } else {
-                println!(
-                    "Ошибка: найденное решение методом МПИ не удовлетворяет системе с заданной точностью."
-                );
+                println!("Ошибка: найденное решение методом МПИ не удовлетворяет системе с заданной точностью.");
                 return None;
             }
         }
+        
         x = x_new;
         y = y_new;
     }
     None
 }
 
-pub fn newton_system(x0: f64, y0: f64, tol: f64, max_iter: usize, h: f64) -> Option<(f64, f64)> {
+pub fn newton_system(
+    x0: f64, 
+    y0: f64, 
+    tol: f64, 
+    max_iter: usize, 
+    h: f64
+) -> Option<(f64, f64, Vec<f64>)> {
     let (mut x, mut y) = (x0, y0);
+    let mut errors = Vec::new(); // Вектор для погрешностей
+    
     for _ in 0..max_iter {
         let fx = f1(x, y);
         let fy = f2(x, y);
@@ -58,23 +75,23 @@ pub fn newton_system(x0: f64, y0: f64, tol: f64, max_iter: usize, h: f64) -> Opt
         let j12 = dfy(x, y, h);
         let j21 = dfx2(x, y, h);
         let j22 = dfy2(x, y, h);
-        
+
         let det = j11 * j22 - j12 * j21;
-        if det.abs() < tol { return None; } 
-        
+        if det.abs() < tol { return None; }
+
         let delta_x = (-fx * j22 + fy * j12) / det;
         let delta_y = (fx * j21 - fy * j11) / det;
-        
+        let error = (delta_x.abs() + delta_y.abs()) / 2.0; // Средняя ошибка
+        errors.push(error);
+
         x += delta_x;
         y += delta_y;
-        
-        if delta_x.abs() < tol && delta_y.abs() < tol {
+
+        if error < tol {
             if f1(x, y).abs() < tol && f2(x, y).abs() < tol {
-                return Some((x, y));
+                return Some((x, y, errors));
             } else {
-                println!(
-                    "Ошибка: найденное решение методом Ньютона не удовлетворяет системе с заданной точностью."
-                );
+                println!("Ошибка: найденное решение методом Ньютона не удовлетворяет системе с заданной точностью.");
                 return None;
             }
         }
