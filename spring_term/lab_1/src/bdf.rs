@@ -1,6 +1,6 @@
 use crate::runge_kutta;
 
-pub fn adams2<F>(
+pub fn bdf2<F>(
     f: F,
     x0: f64,
     z0: f64,
@@ -25,11 +25,11 @@ where
         let (fx, fz) = f(x, z, t);
 
         if result.len() >= 2 {
-            let prev_f1 = f(result[result.len() - 1].1, result[result.len() - 1].2, result[result.len() - 1].0);
-            let prev_f2 = f(result[result.len() - 2].1, result[result.len() - 2].2, result[result.len() - 2].0);
+            let prev_x = result[result.len() - 2].1;
+            let prev_z = result[result.len() - 2].2;
 
-            x += (h / 2.0) * (3.0 * fx - prev_f2.0);
-            z += (h / 2.0) * (3.0 * fz - prev_f2.1);
+            x = (4.0 / 3.0) * x - (1.0 / 3.0) * prev_x + (2.0 / 3.0) * h * fx;
+            z = (4.0 / 3.0) * z - (1.0 / 3.0) * prev_z + (2.0 / 3.0) * h * fz;
         }
 
         t += h;
@@ -39,7 +39,7 @@ where
     result
 }
 
-pub fn adams3<F>(
+pub fn bdf3<F>(
     f: F,
     x0: f64,
     z0: f64,
@@ -64,12 +64,16 @@ where
         let (fx, fz) = f(x, z, t);
 
         if result.len() >= 3 {
-            let prev_f1 = f(result[result.len() - 1].1, result[result.len() - 1].2, result[result.len() - 1].0);
-            let prev_f2 = f(result[result.len() - 2].1, result[result.len() - 2].2, result[result.len() - 2].0);
-            let prev_f3 = f(result[result.len() - 3].1, result[result.len() - 3].2, result[result.len() - 3].0);
+            let prev_x1 = result[result.len() - 1].1;
+            let prev_x2 = result[result.len() - 2].1;
+            let prev_x3 = result[result.len() - 3].1;
 
-            x += (h / 12.0) * (23.0 * fx - 16.0 * prev_f2.0 + 5.0 * prev_f3.0);
-            z += (h / 12.0) * (23.0 * fz - 16.0 * prev_f2.1 + 5.0 * prev_f3.1);
+            let prev_z1 = result[result.len() - 1].2;
+            let prev_z2 = result[result.len() - 2].2;
+            let prev_z3 = result[result.len() - 3].2;
+
+            x = (18.0 / 11.0) * prev_x1 - (9.0 / 11.0) * prev_x2 + (2.0 / 11.0) * prev_x3 + (6.0 / 11.0) * h * fx;
+            z = (18.0 / 11.0) * prev_z1 - (9.0 / 11.0) * prev_z2 + (2.0 / 11.0) * prev_z3 + (6.0 / 11.0) * h * fz;
         }
 
         t += h;
@@ -79,7 +83,7 @@ where
     result
 }
 
-pub fn adams4<F>(
+pub fn bdf4<F>(
     f: F,
     x0: f64,
     z0: f64,
@@ -104,13 +108,18 @@ where
         let (fx, fz) = f(x, z, t);
 
         if result.len() >= 4 {
-            let prev_f1 = f(result[result.len() - 1].1, result[result.len() - 1].2, result[result.len() - 1].0);
-            let prev_f2 = f(result[result.len() - 2].1, result[result.len() - 2].2, result[result.len() - 2].0);
-            let prev_f3 = f(result[result.len() - 3].1, result[result.len() - 3].2, result[result.len() - 3].0);
-            let prev_f4 = f(result[result.len() - 4].1, result[result.len() - 4].2, result[result.len() - 4].0);
+            let prev_x1 = result[result.len() - 1].1;
+            let prev_x2 = result[result.len() - 2].1;
+            let prev_x3 = result[result.len() - 3].1;
+            let prev_x4 = result[result.len() - 4].1;
 
-            x += (h / 24.0) * (55.0 * fx - 59.0 * prev_f2.0 + 37.0 * prev_f3.0 - 9.0 * prev_f4.0);
-            z += (h / 24.0) * (55.0 * fz - 59.0 * prev_f2.1 + 37.0 * prev_f3.1 - 9.0 * prev_f4.1);
+            let prev_z1 = result[result.len() - 1].2;
+            let prev_z2 = result[result.len() - 2].2;
+            let prev_z3 = result[result.len() - 3].2;
+            let prev_z4 = result[result.len() - 4].2;
+
+            x = (48.0 / 25.0) * prev_x1 - (36.0 / 25.0) * prev_x2 + (16.0 / 25.0) * prev_x3 - (3.0 / 25.0) * prev_x4 + (12.0 / 25.0) * h * fx;
+            z = (48.0 / 25.0) * prev_z1 - (36.0 / 25.0) * prev_z2 + (16.0 / 25.0) * prev_z3 - (3.0 / 25.0) * prev_z4 + (12.0 / 25.0) * h * fz;
         }
 
         t += h;
