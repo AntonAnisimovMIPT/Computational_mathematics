@@ -1,4 +1,4 @@
-use crate::runge_kutta;
+use crate::runge_kutta4;
 
 pub fn adams2<F>(
     f: F,
@@ -14,7 +14,7 @@ where
 {
     let mut result = Vec::new();
 
-    let mut rk_result = runge_kutta(&f, x0, z0, t0, t0 + h, h, e);
+    let mut rk_result = runge_kutta4(&f, x0, z0, t0, t0 + h, h, e);
     result.extend(rk_result);
 
     let mut t = t0 + h;
@@ -53,7 +53,7 @@ where
 {
     let mut result = Vec::new();
 
-    let mut rk_result = runge_kutta(&f, x0, z0, t0, t0 + 2.0 * h, h, e);
+    let mut rk_result = runge_kutta4(&f, x0, z0, t0, t0 + 2.0 * h, h, e);
     result.extend(rk_result);
 
     let mut t = t0 + 2.0 * h;
@@ -93,7 +93,7 @@ where
 {
     let mut result = Vec::new();
 
-    let mut rk_result = runge_kutta(&f, x0, z0, t0, t0 + 3.0 * h, h, e);
+    let mut rk_result = runge_kutta4(&f, x0, z0, t0, t0 + 3.0 * h, h, e);
     result.extend(rk_result);
 
     let mut t = t0 + 3.0 * h;

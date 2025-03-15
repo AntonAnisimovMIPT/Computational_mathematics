@@ -26,7 +26,11 @@ def plot_results(filename, title, output_filename):
     plt.savefig(output_filename)
     plt.close()
 
-plot_results('./results/data/runge_kutta.txt', 'Runge-Kutta Method', './results/plots/runge_kutta.png')
+plot_results('./results/data/runge_kutta1.txt', 'Runge-Kutta1 Method', './results/plots/runge_kutta1.png')
+plot_results('./results/data/runge_kutta2.txt', 'Runge-Kutta2 Method', './results/plots/runge_kutta2.png')
+plot_results('./results/data/runge_kutta3.txt', 'Runge-Kutta3 Method', './results/plots/runge_kutta3.png')
+plot_results('./results/data/runge_kutta4.txt', 'Runge-Kutta4 Method', './results/plots/runge_kutta4.png')
+
 
 plot_results('./results/data/adams2.txt', 'Adams2 Method', './results/plots/adams2.png')
 plot_results('./results/data/adams3.txt', 'Adams3 Method', './results/plots/adams3.png')
