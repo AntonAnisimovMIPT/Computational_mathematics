@@ -11,7 +11,7 @@ use crate::{
 
 fn main() {
     let e = 0.1;
-    let h = 0.001;
+    let h = 0.01;
     let t0 = 0.0;
     let t_end = 100.0;
     let x0 = 2.0;
@@ -91,4 +91,19 @@ fn main() {
         writeln!(file, "{} {} {}", t, x, z).unwrap();
     }
     println!("bdf4 computated");
+
+
+    // отдельно для построения фазовой траектории
+    let e_values = vec![0.01, 0.1, 0.2, 0.5, 0.7, 0.9, 1.0, 2.0, 3.0, 4.0, 5.0];
+
+    for &e in &e_values {
+        let f = |x: f64, z: f64, _t: f64| (z, e * (1.0 - x * x) * z - x);
+
+        let result = runge_kutta4(&f, x0, z0, t0, t_end, h, e);
+        let mut file = File::create(format!("./results/data/phase_traces/runge_kutta4_e{}.txt", e)).unwrap();
+        for (t, x, z) in result {
+            writeln!(file, "{} {} {}", t, x, z).unwrap();
+        }
+        println!("runge_kutta4 (e = {}) computated", e);
+    }
 }
