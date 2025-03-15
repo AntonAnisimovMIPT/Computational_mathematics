@@ -8,7 +8,6 @@ where
     let mut z = z0;
     let mut result = Vec::new();
 
-    // Начальные значения с помощью метода Рунге-Кутта
     let initial = runge_kutta(&f, x0, z0, t0, t0 + 2.0 * h, h, e);
     result.extend_from_slice(&initial);
 
@@ -16,7 +15,6 @@ where
         let (fx, fz) = f(x, z, t);
         let (fx_prev, fz_prev) = f(x - h, z - h, t - h);
 
-        // Применение метода дифференцирования назад для x и z
         let dx = h * (fx + fx_prev) / 2.0;
         let dz = h * (fz + fz_prev) / 2.0;
 
