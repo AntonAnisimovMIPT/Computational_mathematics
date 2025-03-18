@@ -13,33 +13,28 @@ def jacobian_system(vars, eps):
     x, y_val, a1, a2 = vars
     J = np.zeros((4, 4))
     
-    # Производные для dxdt
     J[0,0] = 2*a1 - x - (a1**2)/(a2**2)*y_val
     J[0,1] = -x*(a1**2)/(a2**2)
     J[0,2] = x*(2 - 2*a1*y_val/(a2**2))
     J[0,3] = 2*x*a1**2*y_val/(a2**3)
     
-    # Производные для dydt
     J[1,0] = -y_val*(a2**2)/(a1**2)
     J[1,1] = 2*a2 - y_val - (a2**2)/(a1**2)*x
     J[1,2] = 2*y_val*a2**2*x/(a1**3)
     J[1,3] = y_val*(2 - 2*a2*x/(a1**2))
     
-    # Производные для da1dt
     J[2,1] = -eps*2*a1/(a2**2)
     J[2,2] = -eps*2*y_val/(a2**2)
     J[2,3] = eps*4*a1*y_val/(a2**3)
     
-    # Производные для da2dt
     J[3,0] = -eps*2*a2/(a1**2)
     J[3,2] = eps*4*a2*x/(a1**3)
     J[3,3] = -eps*2*x/(a1**2)
     
     return J
 
-# Реализация метода Розенброка-Ваннера 2-го порядка
 def rosenbrock2_step(y_n, h, eps):
-    gamma = 1.7071067811865476  # 1 + 1/√2
+    gamma = 1.7071067811865476  
     alpha21 = 1.0
     gamma21 = -gamma
     m1 = 0.8786796564403576
@@ -49,7 +44,6 @@ def rosenbrock2_step(y_n, h, eps):
     I = np.eye(4)
     A = I - h * gamma * J
     
-    # Вычисление стадий
     f_n = system(y_n, eps)
     k1 = np.linalg.solve(A, h * f_n)
     
@@ -61,7 +55,6 @@ def rosenbrock2_step(y_n, h, eps):
     y_next = y_n + m1 * k1 + m2 * k2
     return y_next
 
-# Реализация метода Розенброка-Ваннера 3-го порядка (ROS3P)
 def rosenbrock3_step(y_n, h, eps):
     gamma = 0.435866521508
     a21 = 1.0
@@ -76,25 +69,22 @@ def rosenbrock3_step(y_n, h, eps):
     
     J = jacobian_system(y_n, eps)
     I = np.eye(4)
-    A = I / gamma - h * J
+    A = I - gamma * h * J 
     
-    # Стадия 1
     f_n = system(y_n, eps)
-    k1 = np.linalg.solve(A, f_n)
+    k1 = np.linalg.solve(A, h * f_n) 
     
-    # Стадия 2
-    y_temp = y_n + a21 * h * k1
+    y_temp = y_n + a21 * k1 
     f_temp = system(y_temp, eps)
-    rhs = f_temp + c21 * k1 / h
+    rhs = h * f_temp + c21 * k1 
     k2 = np.linalg.solve(A, rhs)
     
-    # Стадия 3
-    y_temp = y_n + a31 * h * k1 + a32 * h * k2
+    y_temp = y_n + a31 * k1 + a32 * k2 
     f_temp = system(y_temp, eps)
-    rhs = f_temp + c31 * k1 / h + c32 * k2 / h
+    rhs = h * f_temp + c31 * k1 + c32 * k2 
     k3 = np.linalg.solve(A, rhs)
     
-    y_next = y_n + h * (m1 * k1 + m2 * k2 + m3 * k3)
+    y_next = y_n + m1 * k1 + m2 * k2 + m3 * k3  
     return y_next
 
 def solver(nach_usl, T, h, eps, method='row2'):
@@ -115,21 +105,17 @@ def solver(nach_usl, T, h, eps, method='row2'):
     
     return t, sol
 
-# Параметры
 eps = 0.000001
 nach_usl = np.array([20.0, 20.0, 0.005, 10.0])
 T = 2000 
 h = 0.001  
 
-# Решение методом ROW2
 t_row2, sol_row2 = solver(nach_usl, T, h, eps, method='row2')
 
-# Решение методом ROW3
 t_row3, sol_row3 = solver(nach_usl, T, h, eps, method='row3')
 
-# Построение графиков для ROW2
 plt.figure(figsize=(12, 8))
-plt.suptitle("Метод Розенброка-Ваннера 2-го порядка")
+plt.suptitle("Метод Розенброка 2-го порядка")
 
 plt.subplot(2, 2, 1)
 plt.plot(t_row2, sol_row2[:, 0], 'b-')
@@ -158,9 +144,8 @@ plt.title("a2(t)")
 plt.tight_layout()
 plt.savefig("rosenbrock2.png")
 
-# Построение графиков для ROW3
 plt.figure(figsize=(12, 8))
-plt.suptitle("Метод Розенброка-Ваннера 3-го порядка")
+plt.suptitle("Метод Розенброка 3-го порядка")
 
 plt.subplot(2, 2, 1)
 plt.plot(t_row3, sol_row3[:, 0], 'b-')
