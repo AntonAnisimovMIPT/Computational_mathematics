@@ -74,9 +74,9 @@ def solver(nach_usl, T, h, eps):
     return t, sol
 
 # Параметры
-eps = 0.000001
-nach_usl = np.array([20.0, 20.0, 0.005, 10.0])
-T = 2000 
+eps = 0.001
+nach_usl = np.array([10.0, 10.0, 0.4, 10.0])
+T = 100
 h = 0.001  
 
 t, sol = solver(nach_usl, T, h, eps)
