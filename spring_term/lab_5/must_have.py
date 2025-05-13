@@ -9,14 +9,14 @@ from matplotlib.animation import FuncAnimation
 ##
 
 L = 10.0      
-T = 0.2       
+T = 2.0  
 c = 1.0      
 
-def analytical_solution(x, t):
-    return np.exp(-0.5 * ((x - c * t - L/2) / 0.5)**2)
-
 def initial_condition(x):
-    return analytical_solution(x, 0)
+    return np.sin(2 * np.pi * x / L)
+
+def analytical_solution(x, t):
+    return initial_condition((x - c * t) % L) 
 
 def upwind_scheme(u, c, tau, h):
     u_new = u.copy()
@@ -47,7 +47,7 @@ def lax_wendroff_scheme(u, c, tau, h):
 
 Nx = 100    
 h = L / (Nx - 1) 
-CFL = 0.5      
+CFL = 0.5     
 tau = CFL * h / c 
 Nt = int(T / tau) 
 
@@ -92,7 +92,7 @@ plt.grid()
 plt.savefig('comparison.png', dpi=300)
 plt.close()
 
-Nx_list = [20, 40, 120, 140, 200, 400, 450, 500, 600] 
+Nx_list = [50, 100, 200, 400, 800, 1600]
 errors_upwind = []
 errors_ftcs = []
 errors_lw = []
@@ -102,25 +102,30 @@ for Nx in Nx_list:
     tau = CFL * h / c
     Nt = int(T / tau)
     
-    x = np.linspace(0, L, Nx)
+    x = np.linspace(0, L, Nx, endpoint=False)
     u_analytical = analytical_solution(x, T)
     
     u_upwind = initial_condition(x)
     for n in range(Nt):
         u_upwind = upwind_scheme(u_upwind, c, tau, h)
-    error = np.linalg.norm(u_upwind - u_analytical) / np.sqrt(Nx)
+    error = np.sqrt(np.sum((u_upwind - u_analytical)**2) * h)
+
+
     errors_upwind.append(error)
     
     u_ftcs = initial_condition(x)
     for n in range(Nt):
         u_ftcs = ftcs_scheme(u_ftcs, c, tau, h)
-    error = np.linalg.norm(u_ftcs - u_analytical) / np.sqrt(Nx)
+    error = np.sqrt(np.sum((u_ftcs - u_analytical)**2) * h)
+
+
     errors_ftcs.append(error)
     
     u_lw = initial_condition(x)
     for n in range(Nt):
         u_lw = lax_wendroff_scheme(u_lw, c, tau, h)
-    error = np.linalg.norm(u_lw - u_analytical) / np.sqrt(Nx)
+    error = np.sqrt(np.sum((u_lw - u_analytical)**2) * h)
+
     errors_lw.append(error)
 
 h_list = [L / (Nx - 1) for Nx in Nx_list]
